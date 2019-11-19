@@ -1,29 +1,37 @@
 import React from 'react'
+import styled from 'styled-components'
 import Task from './Task'
+import { Droppable } from 'react-beautiful-dnd'
 
-export default class Project extends React.Component{
-    state = {
-        tasks: {
-            'task-1': {id: 'task-1', content: 'take out the garbage'},
-            'task-2': {id: 'task-2', content: 'walk the cat'}, 
-            'task-3': {id: 'task-3', content: 'charge phone'},
-            'task-4': {id: 'task-4', content: 'cook dinner'}
-        }
-    }
-    render(){
+const Container = styled.div`
+margin: 8px
+border: 1px solid lightgray
+border-radius: 2px`
+const Title = styled.h3`
+padding: 8px`
+const TaskList = styled.div`
+padding: 8px`
+
+export default class Project extends React.Component {
+    state = {}
+    render() {
         return (
-            <div>
-                
-                
-                
-                project
-                <Task/>
-                
-                
-                
-                
-                
-                </div>
+            <Container>
+                <Title>{this.props.project.title}</Title>
+
+                <Droppable droppableId={this.props.project.id}>
+                    {(provided) => (
+                        <TaskList
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                        >
+                            {this.props.tasks.map((task, index) => <Task key={task.id} task={task} index={index}/>)}
+                            {provided.placeholder}
+                        </TaskList>
+                    )}
+                </Droppable>
+            </Container>
+
         )
     }
 }
