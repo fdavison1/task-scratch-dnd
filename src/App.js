@@ -3,10 +3,6 @@ import './App.css';
 import { DragDropContext } from 'react-beautiful-dnd'
 import Project from './components/Project'
 
-
-
-
-
 class App extends React.Component {
   state = {
     projects: {
@@ -14,18 +10,46 @@ class App extends React.Component {
         id: 'project-1',
         title: 'project-1',
         taskIds: ['task-1', 'task-2', 'task-3', 'task-4']
-      }
+      },
+      'project-2': {
+        id: 'project-2',
+        title: 'project-2',
+        taskIds: ['task-5']
+      },
+      'project-3': {
+        id: 'project-3',
+        title: 'project-3',
+        taskIds: ['task-6']
+      },
     },
-    projectOrder: ['project-1'],
+    projectOrder: ['project-1', 'project-2', 'project-3'],
     tasks: {
       'task-1': { id: 'task-1', content: 'take out the garbage' },
       'task-2': { id: 'task-2', content: 'walk the cat' },
       'task-3': { id: 'task-3', content: 'charge phone' },
-      'task-4': { id: 'task-4', content: 'cook dinner' }
+      'task-4': { id: 'task-4', content: 'cook dinner' },
+      'task-5': {id: 'task-5', content: 'wash the dishes'},
+      'task-6': {id: 'task-6', content: 'laundry'}
     }
   }
 
+
+//   onDragStart = () => {
+//     document.body.style.color = 'orange'
+//     document.body.style.transition = 'background-color 0.2s ease'
+//   }
+
+// onDragUpdate = update => {
+//   const { destination } = update
+//   const opacity = destination
+//   ? destination.index / Object.keys(this.state.tasks).length : 0
+//   document.body.style.backgroundColor = `rgba(153, 141, 217, ${opacity})`
+// }
+
+
   onDragEnd = result => {
+    document.body.style.color = 'inherit'
+    document.body.style.backgroundColor = 'inherit'
     const { destination, source, draggableId } = result
 
     if (!destination) {
@@ -39,40 +63,51 @@ class App extends React.Component {
       return
     }
 
-    const project = this.state.projects[source.droppableId]
-    const newTaskIds = Array.from(project.taskIds)
-    newTaskIds.splice(source.index, 1)
-    newTaskIds.splice(destination.index, 0, draggableId)
+    const start = this.state.projects[source.droppableId]
+    const finish = this.state.projects[destination.droppableId]
 
-    const newProject = {
-      ...project,
-      taskIds: newTaskIds
-    }
-    const newState = {
-      ...this.state,
-      projects: {
-        [newProject.id]: newProject
+    if (start === finish){
+      const newTaskIds = Array.from(start.taskIds)
+      newTaskIds.splice(source.index, 1)
+      newTaskIds.splice(destination.index, 0, draggableId)
+      
+      const newProject = {
+        ...start,
+        taskIds: newTaskIds
       }
+  
+      const newState = {
+        ...this.state,
+        projects: {
+          ...this.state.projects,
+          [newProject.id]: newProject
+        }
+      }
+      
+      this.setState(newState)
+      return
     }
-    this.setState(newState)
   }
 
 
   render() {
     return (
       <DragDropContext
+        // onDragStart={this.onDragStart}
+        // onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
+        <div>
 
         {this.state.projectOrder.map(projectId => {
           const project = this.state.projects[projectId]
           const tasks = project.taskIds.map(taskId => this.state.tasks[taskId])
-
-          // return project.title
-          return <Project key={project.id} project={project} tasks={tasks} />
+          
+          return (<Project key={project.id} project={project} tasks={tasks} />)
         })}
 
 
+        </div>
       </DragDropContext>
     )
   }
