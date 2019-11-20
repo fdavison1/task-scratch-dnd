@@ -10,14 +10,14 @@ border-radius: 2px
 display: flex
 flex-direction: column
 background: white`
-const Title = styled.h3`
-padding: 8px`
+const Title = styled.p`
+padding: 0 8px
+font-size: 1.2rem`
 const TaskList = styled.div`
 padding: 8px
 transition: background-color 0.2s ease
 background-color: ${props => (props.isDraggingOver ? 'skyblue' : 'inherit')}
-flex-grow: 1
-min-height: 100px`
+flex-grow: 1`
 
 export default class Project extends React.Component {
     state = {}
