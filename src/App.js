@@ -1,7 +1,10 @@
 import React from 'react';
 import './App.css';
-import { DragDropContext } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import styled from 'styled-components'
 import Project from './components/Project'
+
+const Container = styled.div``
 
 class App extends React.Component {
   state = {
@@ -28,29 +31,29 @@ class App extends React.Component {
       'task-2': { id: 'task-2', content: 'walk the cat' },
       'task-3': { id: 'task-3', content: 'charge phone' },
       'task-4': { id: 'task-4', content: 'cook dinner' },
-      'task-5': {id: 'task-5', content: 'wash the dishes'},
-      'task-6': {id: 'task-6', content: 'laundry'}
+      'task-5': { id: 'task-5', content: 'wash the dishes' },
+      'task-6': { id: 'task-6', content: 'laundry' }
     }
   }
 
 
-//   onDragStart = () => {
-//     document.body.style.color = 'orange'
-//     document.body.style.transition = 'background-color 0.2s ease'
-//   }
+  //   onDragStart = () => {
+  //     document.body.style.color = 'orange'
+  //     document.body.style.transition = 'background-color 0.2s ease'
+  //   }
 
-// onDragUpdate = update => {
-//   const { destination } = update
-//   const opacity = destination
-//   ? destination.index / Object.keys(this.state.tasks).length : 0
-//   document.body.style.backgroundColor = `rgba(153, 141, 217, ${opacity})`
-// }
+  // onDragUpdate = update => {
+  //   const { destination } = update
+  //   const opacity = destination
+  //   ? destination.index / Object.keys(this.state.tasks).length : 0
+  //   document.body.style.backgroundColor = `rgba(153, 141, 217, ${opacity})`
+  // }
 
 
   onDragEnd = result => {
     document.body.style.color = 'inherit'
     document.body.style.backgroundColor = 'inherit'
-    const { destination, source, draggableId } = result
+    const { destination, source, draggableId, type } = result
 
     if (!destination) {
       return
@@ -63,19 +66,32 @@ class App extends React.Component {
       return
     }
 
+    if(type === 'project') {
+      const newProjectOrder = Array.from(this.state.projectOrder)
+      newProjectOrder.splice(source.index, 1)
+      newProjectOrder.splice(destination.index, 0, draggableId)
+
+      const newState = {
+        ...this.state,
+        projectOrder: newProjectOrder
+      }
+      this.setState(newState)
+      return
+    }
+
     const start = this.state.projects[source.droppableId]
     const finish = this.state.projects[destination.droppableId]
 
-    if (start === finish){
+    if (start === finish) {
       const newTaskIds = Array.from(start.taskIds)
       newTaskIds.splice(source.index, 1)
       newTaskIds.splice(destination.index, 0, draggableId)
-      
+
       const newProject = {
         ...start,
         taskIds: newTaskIds
       }
-  
+
       const newState = {
         ...this.state,
         projects: {
@@ -83,13 +99,13 @@ class App extends React.Component {
           [newProject.id]: newProject
         }
       }
-      
+
       this.setState(newState)
       return
     }
     //moving from one list to another
     const startTaskIds = Array.from(start.taskIds)
-    startTaskIds.splice(source.index,1)
+    startTaskIds.splice(source.index, 1)
     const newStart = {
       ...start,
       taskIds: startTaskIds,
@@ -97,7 +113,7 @@ class App extends React.Component {
     const finishTaskIds = Array.from(finish.taskIds)
     finishTaskIds.splice(destination.index, 0, draggableId)
     const newFinish = {
-      ...finish, 
+      ...finish,
       taskIds: finishTaskIds
     }
     const newState = {
@@ -107,7 +123,7 @@ class App extends React.Component {
         [newStart.id]: newStart,
         [newFinish.id]: newFinish,
       }
-      
+
     }
     this.setState(newState)
   }
@@ -120,17 +136,24 @@ class App extends React.Component {
         // onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
-        <div>
+        <Droppable droppableId='all-projects' type='project'>
+          {(provided) => (
+            <Container
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
 
-        {this.state.projectOrder.map(projectId => {
-          const project = this.state.projects[projectId]
-          const tasks = project.taskIds.map(taskId => this.state.tasks[taskId])
-          
-          return (<Project key={project.id} project={project} tasks={tasks} />)
-        })}
+              {this.state.projectOrder.map((projectId, index) => {
+                const project = this.state.projects[projectId]
+                const tasks = project.taskIds.map((taskId) => this.state.tasks[taskId])
 
+                return (<Project key={project.id} project={project} tasks={tasks} index={index}/>)
+              })}
+              {provided.placeholder}
 
-        </div>
+            </Container>
+          )}
+        </Droppable>
       </DragDropContext>
     )
   }
