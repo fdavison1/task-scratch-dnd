@@ -87,6 +87,29 @@ class App extends React.Component {
       this.setState(newState)
       return
     }
+    //moving from one list to another
+    const startTaskIds = Array.from(start.taskIds)
+    startTaskIds.splice(source.index,1)
+    const newStart = {
+      ...start,
+      taskIds: startTaskIds,
+    }
+    const finishTaskIds = Array.from(finish.taskIds)
+    finishTaskIds.splice(destination.index, 0, draggableId)
+    const newFinish = {
+      ...finish, 
+      taskIds: finishTaskIds
+    }
+    const newState = {
+      ...this.state,
+      projects: {
+        ...this.state.projects,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      }
+      
+    }
+    this.setState(newState)
   }
 
 
