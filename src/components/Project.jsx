@@ -10,7 +10,9 @@ border-radius: 2px`
 const Title = styled.h3`
 padding: 8px`
 const TaskList = styled.div`
-padding: 8px`
+padding: 8px
+transition: background-color 0.2s ease
+background-color: ${props => (props.isDraggingOver ? 'skyblue' : 'white')}`
 
 export default class Project extends React.Component {
     state = {}
@@ -20,10 +22,11 @@ export default class Project extends React.Component {
                 <Title>{this.props.project.title}</Title>
 
                 <Droppable droppableId={this.props.project.id}>
-                    {(provided) => (
+                    {(provided, snapshot) => (
                         <TaskList
                             ref={provided.innerRef}
                             {...provided.droppableProps}
+                            isDraggingOver={snapshot.isDraggingOver}
                         >
                             {this.props.tasks.map((task, index) => <Task key={task.id} task={task} index={index}/>)}
                             {provided.placeholder}
